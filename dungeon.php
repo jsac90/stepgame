@@ -11,7 +11,8 @@ $icamefrom = $_SERVER['HTTP_REFERER'];
 if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
 	header("location: index.php");
 	exit();
-} elseif ($icamefrom != 'http://interwebs.xyz/profile.php'){
+} elseif (stripos($icamefrom,'/profile.php')===FALSE){
+	//your URL here
 	header("location: profile.php");
 	exit();
 }

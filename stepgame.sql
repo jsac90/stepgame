@@ -16,6 +16,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `armor`
+--
+
+DROP TABLE IF EXISTS `armor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `armor` (
+  `armor_id` int(11) NOT NULL AUTO_INCREMENT,
+  `armor_name` varchar(45) NOT NULL,
+  `armor_power` int(11) NOT NULL,
+  PRIMARY KEY (`armor_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `cust_data`
 --
 
@@ -44,7 +59,7 @@ CREATE TABLE `entrance` (
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_login` datetime DEFAULT NULL,
   PRIMARY KEY (`player_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='table for creds';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COMMENT='table for creds';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -58,8 +73,25 @@ CREATE TABLE `game_character` (
   `player_id` int(11) NOT NULL,
   `level` int(11) DEFAULT NULL,
   `remaining_steps` int(11) DEFAULT NULL,
-  `createdate` datetime NOT NULL
+  `createdate` datetime NOT NULL,
+  `weapon_id` int(11) DEFAULT NULL,
+  `armor_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='table for player character details';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `weapon`
+--
+
+DROP TABLE IF EXISTS `weapon`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `weapon` (
+  `weapon_id` int(11) NOT NULL AUTO_INCREMENT,
+  `weapon_name` varchar(255) NOT NULL,
+  `weapon_power` int(11) NOT NULL,
+  PRIMARY KEY (`weapon_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -71,4 +103,4 @@ CREATE TABLE `game_character` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-05  2:39:12
+-- Dump completed on 2018-02-06  2:04:51

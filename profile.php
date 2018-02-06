@@ -4,22 +4,25 @@
 
 include 'session.php';
 
-
-
 session_start(); // Starting Session
-
 
 $login_session = $_SESSION["login_user"];
 $prevlogin = $_SESSION["prev_login"];
-$email = $row_cust['emailaddr'];
-$createdate = $row['created']; 
-$currentlogin = $row['last_login'];
+$email = $row_total['emailaddr'];
+$createdate = $row_total['account_created']; 
+$currentlogin = $row_total['last_login'];
 $errormessage = $_SESSION['steperror'];
-$player_level = $row_char['level'];
+$player_level = $row_total['level'];
 $error = "";
 $date = date('Y-m-d H:i:s');
+$weapon_name = $row_total['weapon_name'];
+$weapon_power = $row_total['weapon_power'];
+$armor_name = $row_total['armor_name'];
+$armor_power = $row_total['armor_power'];
+$player_attack = $row_total['level'] + $row_total['weapon_power'];
+$player_defense = $row_total['level'] + $row_total['armor_power'];
 
-//var_dump($diff);
+//var_dump($row_total);
 
 if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
 	header("location: index.php");
@@ -33,6 +36,7 @@ if(isset($errormessage)){
 
 //FOR TESTING
 //var_dump($errormessage);
+
 
 mysqli_close($db); // Closing Connection
 
@@ -53,7 +57,8 @@ mysqli_close($db); // Closing Connection
 
 <?php 
 
-echo "Your player ID is $login_session.
+echo 
+"Your player ID is $login_session.
 <br /><br />
 Your email address is $email.
 <br /><br />
@@ -71,6 +76,22 @@ Player Data:
 </br /> <br /> 
 Character Level: $player_level
 <br /><br />
+Total Current Attack Power: $player_attack
+<br /><br />
+Total Current Defense Power: $player_defense
+<br /><br />
+----------------------
+<br />
+Player Gear:
+</br /> <br />
+Weapon: <b>$weapon_name</b>
+<br />
+Weapon Power: $weapon_power
+</br /> <br />
+Armor: <b>$armor_name</b>
+<br />
+Armor Power: $armor_power
+<br>
 ----------------------
 <br /><br />
 <br /><br />

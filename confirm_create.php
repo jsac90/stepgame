@@ -27,8 +27,8 @@ if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 //if everything is good, create the credentials. 
 }else{
 	//create login credentials
-	mysqli_query($db,"INSERT INTO entrance (hashemail,hashpass,created,raw_email) VALUES 
-	('$hashedun','$hashpass',NOW(),'$username')");
+	mysqli_query($db,"INSERT INTO entrance (hashemail,hashpass,created) VALUES 
+	('$hashedun','$hashpass',NOW())");
 	//create the character
 	//get player ID that was just created
 	$getid = mysqli_query($db,"select * from entrance where hashemail = '$hashedun'");

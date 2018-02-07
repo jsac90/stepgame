@@ -35,7 +35,7 @@ if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 	$idrow = mysqli_fetch_assoc($getid); //gets data from query
 	$id = $idrow["player_id"]; //gets data from query
 	//insert character record
-	mysqli_query($db,"insert into game_character(player_id, level,createdate) values ('$id',1,NOW())"); 
+	mysqli_query($db,"insert into game_character(player_id, createdate) values ('$id',NOW())"); 
 	mysqli_query($db,"insert into cust_data(player_id, emailaddr,addate) values ('$id','$username',NOW())"); 
 	//confirm that the account was created
 	$insertmessage = "Account Created.";

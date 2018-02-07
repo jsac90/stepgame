@@ -11,7 +11,7 @@ $totalcustquery = mysqli_query($db,"
 select 
 e.player_id, e.created as account_created, e.last_login, 
 c.emailaddr, 
-g.level, g.remaining_steps, g.weapon_id, g.armor_id,
+g.level, g.remaining_steps, g.weapon_id, g.armor_id, g.max_hp, g.current_hp,
 w.weapon_name, w.weapon_power,
 a.armor_name, a.armor_power
 from

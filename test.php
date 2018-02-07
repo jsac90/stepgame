@@ -7,8 +7,8 @@ $steps = $og_steps;
 $steprange = $steps / 5;
 $hp = 25;
 $level = 1;
-$player_attack = level + 1;//test only
-$player_defense = level + 1;//test only
+$player_attack = $level + 1;//test only
+$player_defense = $level + 1;//test only
 
 ?>
 
@@ -19,7 +19,10 @@ $player_defense = level + 1;//test only
 <BR>
 <?php 
 
-echo "You begin the day with $steps steps! <br><br>";
+echo "You begin the day with $steps steps! <br>";
+echo "You are level $level <br>";
+echo "You have $hp hit points <br>";
+echo "You have $player_attack attack and $player_defense defense <br>";
 echo "-----------------<br><br>";
 
 while ($steps > 0 && $hp > 0) {
@@ -30,9 +33,9 @@ while ($steps > 0 && $hp > 0) {
 	if ($rand == 3){
 		//calculate monster
 		$monster_level = rand($level, ($level + 2));
-		$monster_hp = 10 + ($level * .5);
-		$monster_attack = rand($level, ($level + 5));
-		$monster_defense = rand($level, ($level + 5));
+		$monster_hp = ceil(10 + ($level * .5));
+		$monster_attack = rand($level, ($level + 2));
+		$monster_defense = rand($level, ($level + 2));
 		
 		//calculate steps used
 		$used_steps = ($og_steps - $steps);
@@ -62,7 +65,7 @@ while ($steps > 0 && $hp > 0) {
 					echo "You MISSED! <br><br>";
 					$whose_turn = 2;
 				} else {
-					$patk = rand(1,5);
+					$patk = ceil($player_attack * (pow(($player_attack / $monster_defense),.366)*.5));
 					echo "You attack for $patk points of damage.<br>";
 					$monster_hp = $monster_hp - $patk;
 					echo "Monster has $monster_hp hp remaining.<br><br>";
@@ -75,7 +78,7 @@ while ($steps > 0 && $hp > 0) {
 					echo "monster MISSED! <br><br>";
 					$whose_turn = 1;
 				} else {
-					$matk = rand(1,5);
+					$matk = ceil($monster_attack * (pow(($monster_attack / $player_defense),.366)*.5));
 					echo "Monster attacks for $matk points of damage.<br>";
 					$hp = $hp - $matk;
 					echo "You have $hp hp remaining.<br><br>";

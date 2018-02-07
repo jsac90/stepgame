@@ -20,6 +20,7 @@ $player_defense = level + 1;//test only
 <?php 
 
 echo "You begin the day with $steps steps! <br><br>";
+echo "-----------------<br><br>";
 
 while ($steps > 0 && $hp > 0) {
 	
@@ -40,6 +41,7 @@ while ($steps > 0 && $hp > 0) {
 		echo "
 			-----------------<br><br>
 			After walking $used_steps steps, a level $monster_level monster appeared. <br>
+			You have $steps steps remaining. <br>
 			Monster has $monster_hp hit points. <br>
 			Monster has $monster_attack attack and $monster_defense defense <br>
 		";
@@ -55,22 +57,35 @@ while ($steps > 0 && $hp > 0) {
 		
 		while ($hp > 0 && $monster_hp > 0){
 			if($whose_turn==1){
-				$patk = rand(1,5);
-				echo "You attack for $patk points of damage.<br>";
-				$monster_hp = $monster_hp - $patk;
-				echo "Monster has $monster_hp hp remaining.<br><br>";
-				$whose_turn = 2;
+				$hitrate = rand(1,10);
+				if (hitrate==3){
+					echo "You MISSED! <br><br>";
+					$whose_turn = 2;
+				} else {
+					$patk = rand(1,5);
+					echo "You attack for $patk points of damage.<br>";
+					$monster_hp = $monster_hp - $patk;
+					echo "Monster has $monster_hp hp remaining.<br><br>";
+					$whose_turn = 2;
+				}
+				
 			}else {
-				$matk = rand(1,5);
-				echo "monster attacks for $matk points of damage.<br>";
-				$hp = $hp - $matk;
-				echo "you have $hp hp remaining.<br><br>";
-				$whose_turn = 1;
+				$hitrate = rand(1,10);
+				if (hitrate == 1||hitrate == 5){ //monster only hits 80% of the time
+					echo "monster MISSED! <br><br>";
+					$whose_turn = 1;
+				} else {
+					$matk = rand(1,5);
+					echo "Monster attacks for $matk points of damage.<br>";
+					$hp = $hp - $matk;
+					echo "You have $hp hp remaining.<br><br>";
+					$whose_turn = 1;
+				}
 			}
 		}
 		//win and lose statements.
 		if ($hp <= 0){
-			echo "Monster killed you!<br>";
+			echo "Monster killed you!<br><br>";
 		} else if ($monster_hp <= 0){
 			echo "You killed monster<br>";
 		} else {
@@ -78,7 +93,7 @@ while ($steps > 0 && $hp > 0) {
 		}
 		
 		//remaining steps after the battle. 
-		echo "You have $steps steps remaining. <br><br>";
+		
 		
 		echo "-----------------<br><br>";
 
@@ -100,6 +115,7 @@ if ($steps <= 0){
 
 
 ?>
+<br><br><br><br>
 </center>
 </body>
 </html>

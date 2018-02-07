@@ -56,7 +56,7 @@ while ($steps > 0 && $hp > 0) {
 		while ($hp > 0 && $monster_hp > 0){
 			if($whose_turn==1){
 				$patk = rand(1,5);
-				echo "you attack for $patk points of damage.<br>";
+				echo "You attack for $patk points of damage.<br>";
 				$monster_hp = $monster_hp - $patk;
 				echo "Monster has $monster_hp hp remaining.<br><br>";
 				$whose_turn = 2;
@@ -68,10 +68,20 @@ while ($steps > 0 && $hp > 0) {
 				$whose_turn = 1;
 			}
 		}
-		
-		echo "You have $steps steps remaining. <br><br>";
-		echo "-----------------<br><br>";
 		//win and lose statements.
+		if ($hp <= 0){
+			echo "Monster killed you!<br>";
+		} else if ($monster_hp <= 0){
+			echo "You killed monster<br>";
+		} else {
+			echo "someone died but we're not sure who...<br>";
+		}
+		
+		//remaining steps after the battle. 
+		echo "You have $steps steps remaining. <br><br>";
+		
+		echo "-----------------<br><br>";
+
 		
 		
 	}//end of encounter	

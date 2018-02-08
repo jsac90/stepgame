@@ -2,15 +2,16 @@
 <head>
 <?php
 
-$og_steps = 10000;
-$steps = $og_steps;
-$steprange = $steps / 5;
-$hp = 25;
-$level = 1;
+$og_steps = 10000; //test only. Eventually pull this from fitbit. 
+$steps = $og_steps; //set initial steps
+//$steprange = $steps / 5; //removed this 2/7 in favor of the 1 in 50 encounter rate. This might change though. 
+$level = 1; //test. this will be pulled from a database later. 
+$hp = (10 + (10*($level * 1.5)));
 $next_level = $level + 1;
-$player_attack = $level + 1;//test only
-$player_defense = $level + 1;//test only
-$player_exp = 0;
+$player_attack = $level + 1; //test only. will eventually depend on gear
+$player_defense = $level + 1; //test only. will eventually depend on gear
+//$player_exp = 0; //test only
+$player_exp = (((37.5*(($level)**2))+(87.5*($level)))-124);
 $next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
 $remaining_exp = $next_level_exp - $player_exp;
 
@@ -27,21 +28,24 @@ echo "You begin the day with $steps steps! <br>";
 echo "You are level $level <br>";
 echo "You have $player_exp total exp. In $remaining_exp exp you will reach level $next_level <br><br>";
 echo "You have $hp hit points <br>";
-echo "You have $player_attack attack and $player_defense defense <br>";
+echo "You have $player_attack attack and $player_defense defense <br><br>";
 
 echo "-----------------<br><br>";
 
 while ($steps > 0 && $hp > 0) {
 	
 	//step range
-	$rand = rand(1,50);
-	// 3 is a monster battle
+	$rand = rand(1,100);
+	// 3 is a monster battle = 1:100 chance
 	if ($rand == 3){
 		//calculate monster
 		$monster_level = rand($level, ($level + 2));
-		$monster_hp = ceil(10 + ($level * .5));
-		$monster_attack = rand($level, ($level + 2));
+		//eventually want to be able to hit weaker monsters but too lazy right now
+		$monster_hp = ceil(10 + ($level));
+		$monster_attack = rand($level, ($level + 2)); 
+		//eventually want to be able to hit weaker monsters but too lazy right now
 		$monster_defense = rand($level, ($level + 2));
+		//eventually want to be able to hit weaker monsters but too lazy right now
 		
 		//calculate steps used
 		$used_steps = ($og_steps - $steps);

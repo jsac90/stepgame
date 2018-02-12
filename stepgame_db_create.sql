@@ -27,7 +27,7 @@ CREATE TABLE `armor` (
   `armor_name` varchar(45) NOT NULL,
   `armor_power` int(11) NOT NULL,
   PRIMARY KEY (`armor_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -59,7 +59,7 @@ CREATE TABLE `entrance` (
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_login` datetime DEFAULT NULL,
   PRIMARY KEY (`player_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COMMENT='table for creds';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COMMENT='table for creds';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,10 +74,13 @@ CREATE TABLE `game_character` (
   `level` int(11) DEFAULT '1',
   `remaining_steps` int(11) DEFAULT NULL,
   `createdate` datetime NOT NULL,
-  `weapon_id` int(11) DEFAULT NULL,
-  `armor_id` int(11) DEFAULT NULL,
+  `weapon_power` int(11) DEFAULT '1',
+  `armor_power` int(11) DEFAULT '1',
   `max_hp` int(11) NOT NULL DEFAULT '25',
-  `current_hp` int(11) NOT NULL DEFAULT '25'
+  `current_hp` int(11) NOT NULL DEFAULT '25',
+  `player_exp` int(11) DEFAULT '0',
+  `has_weapon` varchar(1) DEFAULT '0',
+  `has_armor` varchar(1) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='table for player character details';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -93,7 +96,7 @@ CREATE TABLE `weapon` (
   `weapon_name` varchar(255) NOT NULL,
   `weapon_power` int(11) NOT NULL,
   PRIMARY KEY (`weapon_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -105,4 +108,4 @@ CREATE TABLE `weapon` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-06 22:38:18
+-- Dump completed on 2018-02-12 10:32:50

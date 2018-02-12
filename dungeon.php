@@ -227,6 +227,10 @@ if ($steps > 0 && $hp > 0){
 				$level = $level++;
 				//updates level in db
 				mysqli_query($db,"update game_character set level = $level");
+				//updates max health, refills health
+				$max_hp = (10+(10*($level * 1.5)));
+				mysqli_query($db,"update game_character set current_hp = $max_hp");
+				mysqli_query($db,"update game_character set max_hp = $max_hp");
 				echo "You are now level $level <br>";
 				$next_level = $level + 1;
 				$next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);

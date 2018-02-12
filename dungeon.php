@@ -9,14 +9,18 @@ session_start(); // Starting Session
 //make sure only coming from an approved page. 
 $icamefrom = $_SERVER['HTTP_REFERER'];
 
+$level = $row_total['level']; //pull from db
+$next_level = $level + 1;
+$player_exp = $row_total['player_exp'];
+$next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
+$remaining_exp = $next_level_exp - $player_exp;
 
 //test variables
-$level = 1; //testing purposes
 $max_hp = (10 + (10*($level * 1.5)));
+
 //in prod version please put db info pull in here
 
-
-
+//check login session
 if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
 	header("location: index.php");
 	exit();
@@ -27,11 +31,6 @@ if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
 }
 
 //checks steps from profile page and gives error if null or low or something.
-
-if ($_POST['steps'] == "" && (stripos($icamefrom,'/profile.php')== TRUE)){
-		$_SESSION['steperror'] = "ERROR: STEPS MUST NOT BE NULL";;
-	
-}
 
 if (isset($_POST['steps'])){
 	if ($_POST['steps'] == "" && (stripos($icamefrom,'/profile.php')== TRUE)){
@@ -59,6 +58,7 @@ if (isset($_POST['steps'])){
 	header("location: profile.php");
 }
 
+//pull hp from session
 if (isset($_SESSION['hp']) && $_SESSION['hp'] > 0){
 	$hp = $_SESSION['hp'];
 }elseif ((stripos($icamefrom,'/profile.php')== TRUE)) { //for testing gives full hp every time you enter. 
@@ -80,21 +80,6 @@ if(isset($_POST['logout'])){
 
 //game code starts here
 
-
-
-//default variables
-
-$next_level = $level + 1;
-
-//pull hp from session
-
-//pull steps taken from session
-if (isset($_SESSION['player_exp'])){
-	$player_exp = $_SESSION['player_exp'];
-}else {
-	$player_exp = (((37.5*(($level)**2))+(87.5*($level)))-124);
-}
-
 //pull weapon info from session
 if (isset($_SESSION['weapon_power'])&& $_SESSION['weapon_power'] > 1){
 	$weapon_power = $_SESSION['weapon_power'];
@@ -114,11 +99,8 @@ if (isset($_SESSION['armor_power'])&& $_SESSION['armor_power'] > 1){
 }
 
 //other vars that need something to load before going
-$max_hp = (10 + (10*($level * 1.5)));
 $player_attack = $level + $weapon_power ; //depends on gear
 $player_defense = $level + $armor_power; //depends on gear
-$next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
-$remaining_exp = $next_level_exp - $player_exp;
 $stepdiff = $og_steps - $steps;
 
 //encounter variable
@@ -261,11 +243,26 @@ if ($steps > 0 && $hp > 0){
 			//exp gain
 			$gained_exp = $monster_level * (($monster_attack / $monster_level) + ($monster_defense / $monster_level)); 
 			echo "You gained $gained_exp exp points! <br>";
+			//calculates total player exp
 			$player_exp = $player_exp + $gained_exp;
-			//this is where you need the if statement for levelups - coming soon
+			//inserts to db
+			mysqli_query($db,"update game_character set player_exp = $player_exp");
+			//level up code
+			if($player_exp >= $next_level_exp){
+				echo "YOU LEVELED UP! <BR>";
+				$level = $level++;
+				//updates level in db
+				mysqli_query($db,"update game_character set level = $level");
+				echo "You are now level $level <br>";
+				$next_level = $level + 1;
+				$next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
+			}
 			$remaining_exp = $next_level_exp - $player_exp;
+			
 			$_SESSION['player_exp'] = $player_exp;
 			echo "$remaining_exp exp remaining until level $next_level <br>";
+			
+			
 			echo "You have $hp hit points remaining<br><br>";
 			
 			//reward calculation

@@ -128,7 +128,7 @@ if ($steps > 0 && $hp > 0){
 	
 	//rolls and deducts steps until encounter occurs. 
 	while ($encounter != 3 && $steps > 0 && $hp > 0){
-		$encounter = rand(1,2000);
+		$encounter = rand(1,200);
 		$steps = $steps - 1;
 		$_SESSION['steps'] = $steps;
 	}
@@ -143,12 +143,12 @@ if ($steps > 0 && $hp > 0){
 		echo "you have $steps steps remaining.<br><br>";
 		
 		//calculate monster
-		$monster_level = rand($level, ($level + 2));
+		$monster_level = rand($level, ($level + 5));
 		//eventually want to be able to hit weaker monsters but too lazy right now
 		$monster_hp = ceil(10 + ($level));
-		$monster_attack = rand($level, ($level + 2)); 
+		$monster_attack = ($level + rand($level, ($level + 5)));
 		//eventually want to be able to hit weaker monsters but too lazy right now
-		$monster_defense = rand($level, ($level + 2));
+		$monster_defense = ($level + rand($level, ($level + 5)));
 		//eventually want to be able to have weaker monsters but too lazy right now
 		
 		//display monster
@@ -215,7 +215,7 @@ if ($steps > 0 && $hp > 0){
 			$button = 'Next Encounter';
 			
 			//exp gain
-			$gained_exp = $monster_level * (($monster_attack / $monster_level) + ($monster_defense / $monster_level)); 
+			$gained_exp = 2 * $monster_level * (($monster_attack / $monster_level) + ($monster_defense / $monster_level)); 
 			echo "You gained $gained_exp exp points! <br>";
 			//calculates total player exp
 			$player_exp = $player_exp + $gained_exp;
@@ -224,7 +224,7 @@ if ($steps > 0 && $hp > 0){
 			//level up code
 			if($player_exp >= $next_level_exp){
 				echo "YOU LEVELED UP! <BR>";
-				$level = $level++;
+				$level = $level+1;
 				//updates level in db
 				mysqli_query($db,"update game_character set level = $level");
 				//updates max health, refills health

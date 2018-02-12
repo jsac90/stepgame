@@ -15,9 +15,9 @@ $errormessage = $_SESSION['steperror'];
 $player_level = $row_total['level'];
 $error = "";
 $date = date('Y-m-d H:i:s');
-$has_weapon = $row_total['weapon_name'];
+$has_weapon = $row_total['has_weapon'];
 $weapon_power = $row_total['weapon_power'];
-$has_armor = $row_total['armor_name'];
+$has_armor = $row_total['has_armor'];
 $armor_power = $row_total['armor_power'];
 $player_attack = $row_total['level'] + $row_total['weapon_power'];
 $player_defense = $row_total['level'] + $row_total['armor_power'];
@@ -28,6 +28,11 @@ $player_exp = $row_total['player_exp'];
 
 if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
 	header("location: index.php");
+};
+
+if (isset($_POST['freehp'])){
+	mysqli_query($db,"update game_character set current_hp = max_hp");
+	$errormessage = "HP REFILLED";
 };
 
 if(isset($errormessage)){
@@ -113,6 +118,10 @@ HAVE FUN!
 <form action="dungeon.php" method="post">
 Enter Today's Steps: <input name="steps" type="number" >
 <input name="dungeon" type="submit" value="Enter the dungeon">
+</form>
+<br><br>
+<form action="profile.php" method="post">
+<input name="freehp" type="submit" value="Top up HP">
 </form>
 <br/> <br/><br/> <br/>
 <form action="logout.php" method="post">

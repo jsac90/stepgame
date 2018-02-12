@@ -6,29 +6,29 @@ include 'session.php';
 
 session_start(); // Starting Session
 
+$login_session = $_SESSION["login_user"];
+
 //make sure only coming from an approved page. 
 $icamefrom = $_SERVER['HTTP_REFERER'];
 
+//Setup
+//level and exp
 $level = $row_total['level']; //pull from db
 $next_level = $level + 1;
 $player_exp = $row_total['player_exp'];
 $next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
 $remaining_exp = $next_level_exp - $player_exp;
+//weapons and armor
+$weapon_power = $row_total['weapon_power'];
+$armor_power = $row_total['armor_power'];
+$has_weapon = $row_total['has_weapon'];
+$has_armor = $row_total['has_armor'];
+$player_attack = $level + $weapon_power ; //depends on gear
+$player_defense = $level + $armor_power; //depends on gear
+//HP stuff
+$hp = $row_total['current_hp'];
+$max_hp = $row_total['max_hp'];
 
-//test variables
-$max_hp = (10 + (10*($level * 1.5)));
-
-//in prod version please put db info pull in here
-
-//check login session
-if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
-	header("location: index.php");
-	exit();
-} elseif ((stripos($icamefrom,'/profile.php')== FALSE) && (stripos($icamefrom,'/dungeon.php')== FALSE)){
-	//your URL here
-	header("location: profile.php");
-	exit();
-}
 
 //checks steps from profile page and gives error if null or low or something.
 
@@ -58,18 +58,6 @@ if (isset($_POST['steps'])){
 	header("location: profile.php");
 }
 
-//pull hp from session
-if (isset($_SESSION['hp']) && $_SESSION['hp'] > 0){
-	$hp = $_SESSION['hp'];
-}elseif ((stripos($icamefrom,'/profile.php')== TRUE)) { //for testing gives full hp every time you enter. 
-	$hp = (10 + (10*($level * 1.5)));
-} else {
-	$hp = 0;
-	$_SESSION['hp'] = $hp;
-}
-
-$login_session = $_SESSION["login_user"];
-
 if(isset($_POST['logout'])){
 	header("location: logout.php");
 	exit();
@@ -78,30 +66,16 @@ if(isset($_POST['logout'])){
 	exit();
 };
 
+if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
+	header("location: index.php");
+	exit();
+} elseif ((stripos($icamefrom,'/profile.php')== FALSE) && (stripos($icamefrom,'/dungeon.php')== FALSE)){
+	//your URL here
+	header("location: profile.php");
+	exit();
+}
+
 //game code starts here
-
-//pull weapon info from session
-if (isset($_SESSION['weapon_power'])&& $_SESSION['weapon_power'] > 1){
-	$weapon_power = $_SESSION['weapon_power'];
-	$has_weapon = 1;
-}else {
-	$weapon_power = 1;
-	$has_weapon = 0;
-}
-
-//pull weapon info from session
-if (isset($_SESSION['armor_power'])&& $_SESSION['armor_power'] > 1){
-	$armor_power = $_SESSION['armor_power'];
-	$has_armor = 1;
-}else {
-	$armor_power = 1;
-	$has_armor = 0;
-}
-
-//other vars that need something to load before going
-$player_attack = $level + $weapon_power ; //depends on gear
-$player_defense = $level + $armor_power; //depends on gear
-$stepdiff = $og_steps - $steps;
 
 //encounter variable
 $encounter = '';
@@ -219,7 +193,7 @@ if ($steps > 0 && $hp > 0){
 					$matk = ceil($monster_attack * (pow(($monster_attack / $player_defense),.366)*.5));
 					echo "Monster attacks for $matk points of damage.<br>";
 					$hp = $hp - $matk;
-					$_SESSION['hp'] = $hp;
+					mysqli_query($db,"update game_character set current_hp = $hp");
 					echo "You have $hp hp remaining.<br><br>";
 					$whose_turn = 1;
 				}
@@ -233,7 +207,7 @@ if ($steps > 0 && $hp > 0){
 			$hp = 0; //sets to zero if neg value
 			echo "You have $hp / $max_hp hp remaining. <br><br> you ded <br><br>";
 			$button = 'Return Home';
-			$_SESSION['hp'] = $hp;
+			mysqli_query($db,"update game_character set current_hp = $hp");
 			
 		//you won the battle
 		}elseif ($monster_hp <= 0){
@@ -261,8 +235,6 @@ if ($steps > 0 && $hp > 0){
 			
 			$_SESSION['player_exp'] = $player_exp;
 			echo "$remaining_exp exp remaining until level $next_level <br>";
-			
-			
 			echo "You have $hp hit points remaining<br><br>";
 			
 			//reward calculation
@@ -274,30 +246,31 @@ if ($steps > 0 && $hp > 0){
 				if ($reward_select <= 10){ //10% weapon. Randomly generates power level.
 					echo "<font color='green'>You found a new weapon!</font><br>";
 					$has_weapon = 1;
+					mysqli_query($db,"update game_character set has_weapon = $has_weapon");
 					$weapon_power = $weapon_power + $level + rand($weapon_power, ($weapon_Power + 5));
+					mysqli_query($db,"update game_character set weapon_power = $weapon_power");
 					echo "New Weapon has $weapon_power power.<br>";
 					$player_attack = $level + $weapon_power ; //recalculates attack for moving forward
 					//usually 50 or 75 for armor but changed this for testing
-					$_SESSION['weapon_power'] = $weapon_power;
 				} else if ($reward_select >10 && $reward_select <= 20){ //10% armor. Randomly generates power.
 					echo "<font color='green'>You found new armor!</font><br>";
 					$has_armor = 1;
+					mysqli_query($db,"update game_character set has_armor = $has_armor");
 					$armor_power = $armor_power + $level + rand($armor_power, ($armor_Power + 5));
+					mysqli_query($db,"update game_character set armor_power = $armor_power");
 					echo "New armor has $armor_power power.<br>";
 					$player_defense = $level + $weapon_power ; //recalculates defense moving forward
-					$_SESSION['armor_power'] = $armor_power;
 				} else { //potion - randomly generates how much it restores
 					echo "<font color='green'>You found a health potion!</font><br>";
 					$restore_percent = rand(1,35);
 					$restore_amt = ceil($max_hp * ($restore_percent/100));
 					echo "Potion will restore up to $restore_percent percent of your health = $restore_amt pts <br>";
 					$hp = $hp + $restore_amt;
-					
-					
+
 					if ($hp > $max_hp){
 						$hp = $max_hp; //make sure cant have more than max of your hp. 
 					}
-					$_SESSION['hp'] = $hp;
+					mysqli_query($db,"update game_character set current_hp = $hp");
 					echo "You now have $hp hit points!<br><br>";
 					
 				}
@@ -317,8 +290,6 @@ if ($steps > 0 && $hp > 0){
 	}else if ($hp < 0){
 		$steps = $steps - 1;
 		echo "You are out of HP. <br><br>";
-		$_SESSION['steps'] = $steps;
-		$_SESSION['hp'] = $hp;
 		$button = 'Return Home';
 	
 	//if player runs out of steps while rolling

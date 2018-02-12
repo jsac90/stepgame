@@ -15,12 +15,14 @@ $errormessage = $_SESSION['steperror'];
 $player_level = $row_total['level'];
 $error = "";
 $date = date('Y-m-d H:i:s');
-$weapon_name = $row_total['weapon_name'];
+$has_weapon = $row_total['weapon_name'];
 $weapon_power = $row_total['weapon_power'];
-$armor_name = $row_total['armor_name'];
+$has_armor = $row_total['armor_name'];
 $armor_power = $row_total['armor_power'];
 $player_attack = $row_total['level'] + $row_total['weapon_power'];
 $player_defense = $row_total['level'] + $row_total['armor_power'];
+$hp = $row_total['current_hp'];
+$player_exp = $row_total['player_exp'];
 
 //var_dump($row_total);
 
@@ -74,6 +76,10 @@ Player Data:
 </br /> <br /> 
 Character Level: $player_level
 <br /><br />
+Character HP: $hp
+<br /><br />
+Character EXP: $player_exp
+<br /><br />
 Total Current Attack Power: $player_attack
 <br /><br />
 Total Current Defense Power: $player_defense
@@ -82,11 +88,11 @@ Total Current Defense Power: $player_defense
 <br />
 Player Gear:
 </br /> <br />
-Weapon: <b>$weapon_name</b>
+Weapon: <b>$has_weapon</b>
 <br />
 Weapon Power: $weapon_power
 </br /> <br />
-Armor: <b>$armor_name</b>
+Armor: <b>$has_armor</b>
 <br />
 Armor Power: $armor_power
 <br>

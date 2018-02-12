@@ -11,16 +11,15 @@ $totalcustquery = mysqli_query($db,"
 select 
 e.player_id, e.created as account_created, e.last_login, 
 c.emailaddr, 
-g.level, g.remaining_steps, g.weapon_id, g.armor_id, g.max_hp, g.current_hp, g.player_exp,
-w.weapon_name, w.weapon_power,
-a.armor_name, a.armor_power
+g.level, g.remaining_steps, g.max_hp, g.current_hp, g.player_exp,
+g.weapon_power, g.has_weapon,
+g.armor_power, g.has_armor
 from
 entrance e 
 inner join cust_data c on e.player_id = c.player_id
 inner join game_character g on e.player_id = g.player_id
-left outer join weapon w on g.weapon_id = w.weapon_id
-left outer join armor a on g.armor_id = a.armor_id
-where e.player_id = '$loginsession';
+where e.player_id = $loginsession
+;
 ");
 
 $row_total = mysqli_fetch_assoc($totalcustquery); //gets data from query

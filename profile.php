@@ -34,9 +34,6 @@ if(isset($errormessage)){
 	$error = "";
 };
 
-//FOR TESTING
-//var_dump($errormessage);
-
 
 mysqli_close($db); // Closing Connection
 
@@ -58,7 +55,8 @@ mysqli_close($db); // Closing Connection
 <?php 
 
 echo 
-"Your player ID is $login_session.
+"
+Your player ID is $login_session.
 <br /><br />
 Your email address is $email.
 <br /><br />

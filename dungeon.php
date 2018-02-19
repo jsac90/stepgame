@@ -120,19 +120,33 @@ if ($steps > 0 && $hp > 0){
 		echo "you have $steps steps remaining.<br><br>";
 		
 		//calculate monster
-		$monster_level = rand($level, ($level + 2));
-		//eventually want to be able to hit weaker monsters but too lazy right now
-		$monster_hp = ceil(7 + ($level));
-		$monster_attack = ($level + rand($level, ($level + 2)));
-		//eventually want to be able to hit weaker monsters but too lazy right now
-		$monster_defense = ($level + rand($level, ($level + 2)));
-		//eventually want to be able to have weaker monsters but too lazy right now
+		//monster lower limit
+		if ($level = 1){
+			$monsterlow = 1;
+		} elseif ($level > 6) {
+			$monsterlow = $level - 5; 
+		} else {
+			$monsterlow = $level - 2;
+		}
+		//calculate higher limit
+		$monsterhigh = $level + 5;
+		
+		//calculate actual level
+		$monster_level = ceil(rand($monsterlow, $monsterhigh));
+
+		//calculate stats as a function of the monster's level
+		$mon_stat_low = ($monster_level - ceil($monster_level *.3));
+		$mon_stat_high = ($monster_level + ceil($monster_level *.3));
+		
+		$monster_hp = rand ($mon_stat_low, $mon_stat_high);
+		$monster_attack = rand ($mon_stat_low, $mon_stat_high);
+		$monster_defense = rand ($mon_stat_low, $mon_stat_high);
+
 		
 		//display monster
 		echo "
 			-----------------<br><br>
 			After walking $steps_taken steps, a level $monster_level monster appeared. <br>
-			You have $steps steps remaining. <br>
 			Monster has $monster_hp hit points. <br>
 			Monster has $monster_attack attack and $monster_defense defense <br><br>
 		";

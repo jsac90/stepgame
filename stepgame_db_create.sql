@@ -72,7 +72,7 @@ DROP TABLE IF EXISTS `game_character`;
 CREATE TABLE `game_character` (
   `player_id` int(11) NOT NULL,
   `level` int(11) DEFAULT '1',
-  `remaining_steps` int(11) DEFAULT NULL,
+  `remaining_steps` int(11) DEFAULT '0',
   `createdate` datetime NOT NULL,
   `weapon_power` int(11) DEFAULT '1',
   `armor_power` int(11) DEFAULT '1',
@@ -108,4 +108,4 @@ CREATE TABLE `weapon` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-12 10:32:50
+-- Dump completed on 2018-02-19  0:06:52

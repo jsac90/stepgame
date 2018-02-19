@@ -6,12 +6,27 @@ include 'session.php';
 
 session_start(); // Starting Session
 
+$errormessage = $_SESSION['steperror'];
+$steps = $row_total['remaining_steps'];
+
+if (isset($_POST['addsteps'])){
+	$newsteps = $_POST['steps'];
+	
+	//sets negative and empty values to zero
+	if ($newsteps <= '0' || !isset($_POST['addsteps']) ){
+		$newsteps = 0;
+	}
+	
+	$steps = $steps + $newsteps;
+	mysqli_query($db,"update game_character set remaining_steps = $steps");
+	$errormessage = "Added $newsteps to profile. Total steps = $steps";
+};
+
 $login_session = $_SESSION["login_user"];
 $prevlogin = $_SESSION["prev_login"];
 $email = $row_total['emailaddr'];
 $createdate = $row_total['account_created']; 
 $currentlogin = $row_total['last_login'];
-$errormessage = $_SESSION['steperror'];
 $player_level = $row_total['level'];
 $error = "";
 $date = date('Y-m-d H:i:s');
@@ -22,7 +37,9 @@ $armor_power = $row_total['armor_power'];
 $player_attack = $row_total['level'] + $row_total['weapon_power'];
 $player_defense = $row_total['level'] + $row_total['armor_power'];
 $hp = $row_total['current_hp'];
+$max_hp = $row_total['max_hp'];
 $player_exp = $row_total['player_exp'];
+
 
 //var_dump($row_total);
 
@@ -30,10 +47,27 @@ if (!isset($_SESSION['login_user']) || $_SESSION['login_user'] == ''){
 	header("location: index.php");
 };
 
-if (isset($_POST['freehp'])){
-	mysqli_query($db,"update game_character set current_hp = max_hp");
-	$errormessage = "HP REFILLED";
+if (isset($_POST['trade'])){
+	
+	if ($steps >= 1000 && $hp < $max_hp ){
+		$steps = $steps - 1000;
+		$hp = $hp + 10;
+		if ($hp >= $max_hp){
+			$hp = $max_hp;
+		}
+		mysqli_query($db,"update game_character set remaining_steps = $steps");
+		mysqli_query($db,"update game_character set current_hp = $hp");
+		$errormessage = "1000 steps traded for 10 HP. Your HP is now $hp / $max_hp. You have $steps remaining";
+	} else if ($steps < 1000) {
+		$errormessage = "NOT ENOUGH STEPS TO TRADE. YOU NEED AT LEAST 1000 STEPS TO BE ABLE TO TRADE!";
+	} else if ($hp == $max_hp) {
+		$errormessage = "You are already at max health, you dummy!";
+	} else {
+		$errormessage = "UNKNOWN ERROR - NOTHING HAPPENED";
+	}
 };
+
+
 
 if(isset($errormessage)){
 	$error = $errormessage;
@@ -81,8 +115,10 @@ Player Data:
 </br /> <br /> 
 Character Level: $player_level
 <br /><br />
-Character HP: $hp
+Character HP: $hp / $max_hp
 <br /><br />
+You have $steps steps available.
+<br /> <br />
 Character EXP: $player_exp
 <br /><br />
 Total Current Attack Power: $player_attack
@@ -114,16 +150,32 @@ HAVE FUN!
 
 
 
+<form action="" method="post">
+<?php
+if($steps < 2000){
+
+?>
+Enter Additional Steps: <input name="steps" type="number" > 
+<input name="addsteps" type="submit" value="Add Steps to Profile">
+<br><br>
+<?php
+
+}
+?>
+</form>
+<br/> <br/>
 
 <form action="dungeon.php" method="post">
-Enter Today's Steps: <input name="steps" type="number" >
 <input name="dungeon" type="submit" value="Enter the dungeon">
 </form>
-<br><br>
+
 <form action="profile.php" method="post">
-<input name="freehp" type="submit" value="Top up HP">
+<input name="trade" type="submit" value="Exchange 1000 steps for 10 HP">
 </form>
-<br/> <br/><br/> <br/>
+
+<br/> <br/>
+<br/> <br/>
+
 <form action="logout.php" method="post">
 <input name="logout" type="submit" value="Log Out">
 </form>

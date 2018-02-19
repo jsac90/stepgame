@@ -28,35 +28,12 @@ $player_defense = $level + $armor_power; //depends on gear
 //HP stuff
 $hp = $row_total['current_hp'];
 $max_hp = $row_total['max_hp'];
+$existing_steps = $row_total['remaining_steps']; 
 
 
-//checks steps from profile page and gives error if null or low or something.
-
-if (isset($_POST['steps'])){
-	if ($_POST['steps'] == "" && (stripos($icamefrom,'/profile.php')== TRUE)){
-		$_SESSION['steperror'] = "ERROR: STEPS MUST NOT BE NULL";
-		header("location: profile.php");
-		exit();
-	}else if ($_POST['steps'] > 30000 && (stripos($icamefrom,'/profile.php')== TRUE)){
-		$_SESSION['steperror'] = "ERROR: DON'T CHEAT!";
-		header("location: profile.php");
-		exit();
-	}else if ($_POST['steps'] < 1000 && (stripos($icamefrom,'/profile.php')== TRUE)){
-		$_SESSION['steperror'] = "ERROR: YOU MUST HAVE AT LEAST 1000 STEPS TO ENTER THE DUNGEON!";
-		header("location: profile.php");
-		exit();
-	}else{
-		$steps = $_POST['steps'];
-		$og_steps = $steps;
-		$_SESSION['og_steps'] = $og_steps;
-	}
-} else if (isset($_SESSION['steps'])){
-	$steps = $_SESSION['steps'];
-	$og_steps = $_SESSION['og_steps'];
-} else {
-	$_SESSION['steperror'] = "ERROR: some step related problem. Figure it out, jerk. ";
-	header("location: profile.php");
-}
+$steps = $row_total['remaining_steps'];
+$og_steps = $steps;
+$_SESSION['og_steps'] = $og_steps;
 
 if(isset($_POST['logout'])){
 	header("location: logout.php");
@@ -106,6 +83,7 @@ if(isset($_POST['next']) && $steps > 0 && $hp > 0 ){
 
 
 //set the stage...
+echo "You have $steps steps to start with...<br>";
 echo "You are level $level <br>";
 echo "You have $player_exp total exp. In $remaining_exp exp you will reach level $next_level <br><br>";
 echo "You have $hp hit points <br>";
@@ -130,25 +108,24 @@ if ($steps > 0 && $hp > 0){
 	while ($encounter != 3 && $steps > 0 && $hp > 0){
 		$encounter = rand(1,200);
 		$steps = $steps - 1;
-		$_SESSION['steps'] = $steps;
 	}
 	
 	//encounter happens here
 	if ($steps > 0 && $hp > 0) { 
 		$steps = $steps - 1; //deducts the step
 		$steps_taken = $og_steps - $steps; //calculates how many steps have been taken
-		$_SESSION['steps'] = $steps; //saves steps taken to a session variable
+		mysqli_query($db,"update game_character set remaining_steps = $steps");
 		$button = 'Next Encounter'; //changes the button text.
 		
 		echo "you have $steps steps remaining.<br><br>";
 		
 		//calculate monster
-		$monster_level = rand($level, ($level + 5));
+		$monster_level = rand($level, ($level + 2));
 		//eventually want to be able to hit weaker monsters but too lazy right now
-		$monster_hp = ceil(10 + ($level));
-		$monster_attack = ($level + rand($level, ($level + 5)));
+		$monster_hp = ceil(7 + ($level));
+		$monster_attack = ($level + rand($level, ($level + 2)));
 		//eventually want to be able to hit weaker monsters but too lazy right now
-		$monster_defense = ($level + rand($level, ($level + 5)));
+		$monster_defense = ($level + rand($level, ($level + 2)));
 		//eventually want to be able to have weaker monsters but too lazy right now
 		
 		//display monster
@@ -293,6 +270,7 @@ if ($steps > 0 && $hp > 0){
 	//if the player runs out of HP while rolling
 	}else if ($hp < 0){
 		$steps = $steps - 1;
+		mysqli_query($db,"update game_character set remaining_steps = $steps");
 		echo "You are out of HP. <br><br>";
 		$button = 'Return Home';
 	
@@ -300,13 +278,13 @@ if ($steps > 0 && $hp > 0){
 	} else {
 		$stepdiff = $og_steps - $steps;
 		echo "You took $stepdiff steps. You are out of steps!<br><br>";
-		$_SESSION['steps'] = $steps;
+		mysqli_query($db,"update game_character set remaining_steps = $steps");
 		$button = 'Return Home';
 	}
 
 //if player had no steps to begin with
 } else if ($steps <= 0){
-	echo "You took $og_steps steps. You are out of steps!<br><br>";
+	echo "You took $og_steps steps without finding anything. You are out of steps!<br><br>";
 	$button = 'Return Home';
 	
 //if the player did not have HP coming in to this. 

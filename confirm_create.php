@@ -1,7 +1,8 @@
 <html> 
 <head>
 <title> confirm creation </title>
-
+<link rel="stylesheet" type="text/css" href="styles/stepgame.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <?php
 
 require 'setup/dbconnect.php';
@@ -47,10 +48,13 @@ mysqli_close($db);
 
 </head>
 <body>
-
+<center>
+<img id="logo" src = "/images/stepgamelogo.png"/>
+<br>
+<h1> CREATION RESULT </h1>
 <?php echo "$message"; ?>
 <br /> <br />
-<?php echo "$insertmessage"; ?>
+<?php echo "<H2>$insertmessage</H2>"; ?>
 <br /> <br />
 <form action="index.php" method="post">
 <input type="submit" name="gohome" value="Go Home" />
@@ -58,6 +62,6 @@ mysqli_close($db);
 <form action="createuser.php" method="post">
 <input type="submit" name="gocreate" value="Back To Create" />
 
-
+</center>
 </body>
 </html>

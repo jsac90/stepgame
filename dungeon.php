@@ -1,5 +1,8 @@
 <html>
 <head>
+
+<link rel="stylesheet" type="text/css" href="styles/stepgame.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <?php 
 
 include 'session.php';
@@ -15,6 +18,7 @@ $icamefrom = $_SERVER['HTTP_REFERER'];
 //level and exp
 $level = $row_total['level']; //pull from db
 $next_level = $level + 1;
+
 $player_exp = $row_total['player_exp'];
 $next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
 $remaining_exp = $next_level_exp - $player_exp;
@@ -77,6 +81,7 @@ if(isset($_POST['next']) && $steps > 0 && $hp > 0 ){
 </head>
 <body>
 <center>
+<img id="logo" src="images/stepgamelogo.png" >
 <h1> Welcome to THE DUNGEON! </h1>
 <br><br>
 <?php 
@@ -85,8 +90,8 @@ if(isset($_POST['next']) && $steps > 0 && $hp > 0 ){
 //set the stage...
 echo "You have $steps steps to start with...<br>";
 echo "You are level $level <br>";
-echo "You have $player_exp total exp. In $remaining_exp exp you will reach level $next_level <br><br>";
-echo "You have $hp hit points <br>";
+echo "You have $player_exp total exp. In $remaining_exp exp you will reach level $next_level ($next_level_exp exp total) <br><br>";
+echo "You have $hp / $max_hp hit points <br>";
 echo "You have $player_attack attack and $player_defense defense <br><br>";
 if($has_weapon == 1){
 	echo "You have a weapon. It has $weapon_power power <br>";
@@ -120,28 +125,30 @@ if ($steps > 0 && $hp > 0){
 		echo "you have $steps steps remaining.<br><br>";
 		
 		//calculate monster
-		//monster lower limit
-		if ($level = 1){
-			$monsterlow = 1;
-		} elseif ($level > 6) {
-			$monsterlow = $level - 5; 
-		} else {
-			$monsterlow = $level - 2;
-		}
-		//calculate higher limit
-		$monsterhigh = $level + 5;
 		
 		//calculate actual level
-		$monster_level = ceil(rand($monsterlow, $monsterhigh));
-
 		//calculate stats as a function of the monster's level
-		$mon_stat_low = ($monster_level - ceil($monster_level *.3));
-		$mon_stat_high = ($monster_level + ceil($monster_level *.3));
+		//should also compliment player stats
 		
-		$monster_hp = rand ($mon_stat_low, $mon_stat_high);
-		$monster_attack = rand ($mon_stat_low, $mon_stat_high);
-		$monster_defense = rand ($mon_stat_low, $mon_stat_high);
+		
+		if ($level > 1){
+			$monster_level = ceil(round(rand($level * .6, $level + 2)));
+			$monster_hp = ceil(round(rand(($max_hp*.5),($max_hp*1.2)))) + $monster_level;
 
+		}else{
+			$monster_level = ceil(round(rand(1,3)));
+			$monster_hp = ceil(round(rand(($max_hp*.2),($max_hp*1.2)))) + $monster_level;
+		}
+		
+		$monster_attack = ceil(round(rand($monster_level, $monster_level*1.5)));
+		$monster_defense = ceil(round(rand($monster_level, $monster_level*1.5)));
+		
+?>
+
+		<img src="images/shittymonsters/<?php echo rand(1,10); ?>.png"><br><br>
+
+<?php		
+		//pick monster picture lol I have 10 monsters right now
 		
 		//display monster
 		echo "
@@ -168,7 +175,7 @@ if ($steps > 0 && $hp > 0){
 					echo "You MISSED! <br><br>";
 					$whose_turn = 2;
 				} else {
-					$patk = ceil($player_attack * (pow(($player_attack / $monster_defense),.366)*.5));
+					$patk = ceil($player_attack * (pow(($player_attack / $monster_defense),.4)*.5));
 					echo "You attack for $patk points of damage.<br>";
 					$monster_hp = $monster_hp - $patk;
 					echo "Monster has $monster_hp hp remaining.<br><br>";
@@ -181,7 +188,7 @@ if ($steps > 0 && $hp > 0){
 					echo "monster MISSED! <br><br>";
 					$whose_turn = 1;
 				} else {
-					$matk = ceil($monster_attack * (pow(($monster_attack / $player_defense),.366)*.5));
+					$matk = ceil($monster_attack * (pow(($monster_attack / $player_defense),.4)*.5));
 					echo "Monster attacks for $matk points of damage.<br>";
 					$hp = $hp - $matk;
 					mysqli_query($db,"update game_character set current_hp = $hp");
@@ -197,8 +204,14 @@ if ($steps > 0 && $hp > 0){
 		if ($hp <= 0){
 			$hp = 0; //sets to zero if neg value
 			echo "You have $hp / $max_hp hp remaining. <br><br> you ded <br><br>";
+			$loserexp = ceil(($monster_level * (($monster_attack / $monster_level) + ($monster_defense / $monster_level)))*.5+1);
+			$ifonly_exp = ceil(2 * $monster_level * (($monster_attack / $monster_level) + ($monster_defense / $monster_level)));
+			$player_exp = $player_exp + $loserexp;
+			echo "In defeat, you learn more about battle. You gain  $loserexp experience. You now have $player_exp exp.<br><br>";
+			echo "If you had won, you would have gained $ifonly_exp exp. Oh well. Next time.<br><Br>";
 			$button = 'Return Home';
 			mysqli_query($db,"update game_character set current_hp = $hp");
+			mysqli_query($db,"update game_character set player_exp = $player_exp");
 			
 		//you won the battle
 		}elseif ($monster_hp <= 0){
@@ -206,7 +219,7 @@ if ($steps > 0 && $hp > 0){
 			$button = 'Next Encounter';
 			
 			//exp gain
-			$gained_exp = 2 * $monster_level * (($monster_attack / $monster_level) + ($monster_defense / $monster_level)); 
+			$gained_exp = ceil(2 * $monster_level * (($monster_attack / $monster_level) + ($monster_defense / $monster_level))); 
 			echo "You gained $gained_exp exp points! <br>";
 			//calculates total player exp
 			$player_exp = $player_exp + $gained_exp;
@@ -214,52 +227,52 @@ if ($steps > 0 && $hp > 0){
 			mysqli_query($db,"update game_character set player_exp = $player_exp");
 			//level up code
 			if($player_exp >= $next_level_exp){
-				echo "YOU LEVELED UP! <BR>";
-				$level = $level+1;
+				echo "<h2>YOU LEVELED UP!</h2> <BR>";
+				$level = $level + 1;
+				$next_level = $next_level + 1;
+				$max_hp = (10+(10*($level * 1.5)));
+				$hp = $max_hp;
+				$next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
 				//updates level in db
 				mysqli_query($db,"update game_character set level = $level");
 				//updates max health, refills health
-				$max_hp = (10+(10*($level * 1.5)));
 				mysqli_query($db,"update game_character set current_hp = $max_hp");
 				mysqli_query($db,"update game_character set max_hp = $max_hp");
+				//words
 				echo "You are now level $level <br>";
-				$next_level = $level + 1;
-				$next_level_exp = (((37.5*(($next_level)**2))+(87.5*($next_level)))-124);
 			}
 			$remaining_exp = $next_level_exp - $player_exp;
 			
-			$_SESSION['player_exp'] = $player_exp;
 			echo "$remaining_exp exp remaining until level $next_level <br>";
 			echo "You have $hp hit points remaining<br><br>";
 			
 			//reward calculation
 			$reward_chance = rand(1,100);
-			if($reward_chance >= 80){ //20% chance to get something good
+			if($reward_chance >= 90){ //10% chance to get something good
 				echo "You get a reward!<br>";
 				//pick the actual reward. if gear, will ALWAYS be better than what you have.
 				$reward_select = rand (1,100);
-				if ($reward_select <= 10){ //10% weapon. Randomly generates power level.
-					echo "<font color='green'>You found a new weapon!</font><br>";
+				if ($reward_select <= 5){ //5% weapon. Randomly generates power level.
+					echo "<font color='green'><h2>YOU FOUND A NEW WEAPON!</h2></font><br>";
 					$has_weapon = 1;
 					mysqli_query($db,"update game_character set has_weapon = $has_weapon");
-					$weapon_power = $weapon_power + $level + rand($weapon_power, ($weapon_Power + 5));
+					$weapon_power = rand($weapon_power+1, ceil($weapon_Power*1.05)+1);
 					mysqli_query($db,"update game_character set weapon_power = $weapon_power");
-					echo "New Weapon has $weapon_power power.<br>";
+					echo "<H3>New Weapon has $weapon_power power.</H3><br>";
 					$player_attack = $level + $weapon_power ; //recalculates attack for moving forward
-					//usually 50 or 75 for armor but changed this for testing
-				} else if ($reward_select >10 && $reward_select <= 20){ //10% armor. Randomly generates power.
-					echo "<font color='green'>You found new armor!</font><br>";
+				} else if ($reward_select >5 && $reward_select <= 10){ //5% armor. Randomly generates power.
+					echo "<font color='green'><h2>YOU FOUND NEW ARMOR!</h2></font><br>";
 					$has_armor = 1;
 					mysqli_query($db,"update game_character set has_armor = $has_armor");
-					$armor_power = $armor_power + $level + rand($armor_power, ($armor_Power + 5));
+					$armor_power = rand($armor_power+1, ceil($armor_Power*1.05)+1);
 					mysqli_query($db,"update game_character set armor_power = $armor_power");
-					echo "New armor has $armor_power power.<br>";
+					echo "<H3>New armor has $armor_power power.</H3><br>";
 					$player_defense = $level + $weapon_power ; //recalculates defense moving forward
 				} else { //potion - randomly generates how much it restores
-					echo "<font color='green'>You found a health potion!</font><br>";
-					$restore_percent = rand(1,35);
+					echo "<font color='green'><h2>YOU FOUND A HEALTH POTION!<h2></font><br>";
+					$restore_percent = rand(1,20);
 					$restore_amt = ceil($max_hp * ($restore_percent/100));
-					echo "Potion will restore up to $restore_percent percent of your health = $restore_amt pts <br>";
+					echo "<H3>Potion will restore up to $restore_percent percent of your health = $restore_amt pts </H3> <br>";
 					$hp = $hp + $restore_amt;
 
 					if ($hp > $max_hp){
@@ -321,9 +334,9 @@ if ($steps > 0 && $hp > 0){
 
 
 <form action="" method="post">
-<input name="next" type="submit" value="<?php echo "$button";?>">
-<input name="profile" type="submit" value="Back To Profile">
-<input name="logout" type="submit" value="Log Out">
+<input name="next" type="submit" value="<?php echo "$button";?>"> <br><br>
+<input name="profile" type="submit" value="Back To Profile"> <br><br>
+<input name="logout" type="submit" value="Log Out"> <br><br>
 </form>
 
 

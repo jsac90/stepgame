@@ -1,5 +1,8 @@
 <html>
 <head>
+
+<link rel="stylesheet" type="text/css" href="styles/stepgame.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Login Page</title>
 
 <?php
@@ -16,14 +19,15 @@ header("location: profile.php");
 <body>
 <center>
 
-<img src = "/images/shrug.jpg" />
+<img id="logo" src = "/images/stepgamelogo.png"/>
 
 <h1> Please Log In </h1>
 
 <form action="" method="post">
-<label>Email Address: </label>
+<label>Email Address: </label><br>
 <input type="text" name="username">
-<label>Password: </label>
+<br><br>
+<label>Password: </label><br>
 <input type="password" name="password">
 <br /> <br />
 <input name="submit" type="submit" value="Log In">
